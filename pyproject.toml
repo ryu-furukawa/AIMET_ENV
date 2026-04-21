@@ -1,0 +1,30 @@
+[project]
+name = "aimet-ruri"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "accelerate>=1.13.0",
+    "aimet-onnx>=2.28.0",
+    "datasets>=4.8.4",
+    "fugashi>=1.5.2",
+    "loguru>=0.7.3",
+    "onnx>=1.21.0",
+    "onnxsim-prebuilt>=0.4.39.post2",
+    "openai>=2.32.0",
+    "pydantic>=2.13.3",
+    "sentence-transformers>=5.4.1",
+    "sentencepiece>=0.2.1",
+    "smart-open>=7.6.0",
+    "tiktoken>=0.12.0",
+    "tokenizers>=0.22.2",
+    "torch>=2.11.0",
+    "transformers>=5.5.3",
+    "unidic-lite>=1.0.8",
+]
+
+[dependency-groups]
+dev = [
+    "ipykernel>=7.2.0",
+]

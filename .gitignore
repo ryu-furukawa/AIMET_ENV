@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+
+# env
+.venv/
+.env
+
+# large artifacts
+*.onnx
+*.pt
+*.pth
+*.raw
+*.npy
+
+# logs
+*.log
