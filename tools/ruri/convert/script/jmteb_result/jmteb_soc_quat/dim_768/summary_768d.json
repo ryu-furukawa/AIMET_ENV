@@ -1,0 +1,7 @@
+{
+    "Retrieval": {
+        "nlp_journal_abs_intro": {
+            "ndcg@10": 0.8397040465690616
+        }
+    }
+}
