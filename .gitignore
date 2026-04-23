@@ -16,3 +16,4 @@ __pycache__/
 # logs
 *.log
 results/
+ruri-small-v2/*

@@ -1,0 +1,158 @@
+import os
+import numpy as np
+import onnx
+import onnxruntime as ort
+
+from transformers import AutoTokenizer
+
+import aimet_onnx
+from aimet_onnx.common.defs import QuantScheme
+from aimet_onnx import QuantizationSimModel
+
+#FP32_ONNX = "/root/AIMET_ruri/ruri-onnx/model_simplified.onnx"
+FP32_ONNX = "/root/AIMET_ruri/ruri-onnx/model_simplified.onnx"
+#FP32_ONNX = "/root/AIMET_ruri/ruri-onnx/model.onnx"  # ← 適宜変更
+OUT_DIR = "/root/AIMET_ENV/tools/ruri/model"
+
+os.makedirs(OUT_DIR, exist_ok=True)
+
+MODEL_ID = "/root/AIMET_ruri/ruri-small-v2"
+# tokenizer は事前にロード
+tokenizer = AutoTokenizer.from_pretrained(
+    "/root/AIMET_ruri/ruri-small-v2",
+    trust_remote_code=True,
+)
+
+# 1) load onnx
+model = onnx.load_model(FP32_ONNX)
+
+# 2) (推奨) simplify
+try:
+    import onnxsim
+    model, _ = onnxsim.simplify(model)
+except Exception as e:
+    print("onnxsim simplify failed, continue with original model:", repr(e))
+
+    
+# 3) create QuantSim (CPU only, W8/A16)
+providers = ["CPUExecutionProvider"]
+sim = QuantizationSimModel(
+
+    model,
+    param_type=aimet_onnx.int8,
+    activation_type=aimet_onnx.int16,
+    #quant_scheme=QuantScheme.min_max,
+    quant_scheme=QuantScheme.post_training_tf_enhanced,
+    #config_file="default",
+    config_file="htp_v73",
+    #config_file="/root/AIMET_ruri_v2/tool/quantsim_fp_escape.json",  # ← 適宜変更
+    providers=providers,
+)
+
+# ONNX input names (must match tokenizer outputs)
+onnx_input_names = [i.name for i in sim.model.model.graph.input]
+print("ONNX inputs:", onnx_input_names)
+
+# 4) calibration data (代表テキスト。実運用に近い文を500〜1000程度推奨)
+"""
+calib_texts = [
+    "クエリ: 瑠璃色はどんな色？",
+    "文章: 瑠璃色（るりいろ）は、紫みを帯びた濃い青。名は、半貴石の瑠璃（ラピスラズリ、英: lapis lazuli）による。JIS慣用色名では「こい紫みの青」（略号 dp-pB）と定義している[1][2]。",
+    "クエリ: ワシやタカのように、鋭いくちばしと爪を持った大型の鳥類を総称して「何類」というでしょう?",
+    "文章: ワシ、タカ、ハゲワシ、ハヤブサ、コンドル、フクロウが代表的である。これらの猛禽類はリンネ前後の時代(17~18世紀)には鷲類・鷹類・隼類及び梟類に分類された。ちなみにリンネは狩りをする鳥を単一の目(もく)にまとめ、vultur(コンドル、ハゲワシ)、falco(ワシ、タカ、ハヤブサなど)、strix(フクロウ)、lanius(モズ)の4属を含めている。",
+] * 200  # 例: 900文
+"""
+"""
+queries = [
+    "クエリ: 瑠璃色はどんな色？",
+     "クエリ: ワシやタカのように、鋭いくちばしと爪を持った大型の鳥類を総称して「何類」というでしょう?",
+] * 300
+
+passages = [
+     "文章: 瑠璃色（るりいろ）は、紫みを帯びた濃い青。名は、半貴石の瑠璃（ラピスラズリ、英: lapis lazuli）による。JIS慣用色名では「こい紫みの青」（略号 dp-pB）と定義している[1][2]。",
+     "文章: ワシ、タカ、ハゲワシ、ハヤブサ、コンドル、フクロウが代表的である。これらの猛禽類はリンネ前後の時代(17~18世紀)には鷲類・鷹類・隼類及び梟類に分類された。ちなみにリンネは狩りをする鳥を単一の目(もく)にまとめ、vultur(コンドル、ハゲワシ)、falco(ワシ、タカ、ハヤブサなど)、strix(フクロウ)、lanius(モズ)の4属を含めている。",
+] * 120
+
+calib_texts = queries + passages
+
+
+
+"""
+from datasets import Dataset 
+arrow_path = "/root/test_qut/data/vocab800/article_200_exe.arrow"  # ← 適宜変更
+ds = Dataset.from_file(arrow_path)
+
+calib_texts = ds["text"]  # ← "text" 列を適宜変更
+
+
+
+def make_feed(text: str, max_length: int = 512):
+    enc = tokenizer(
+        text,
+        padding="max_length",
+        truncation=True,
+        max_length=512,
+        return_tensors="np",
+    )
+
+    feed = {}
+
+    # input_ids / attention_mask / token_type_ids
+    if "input_ids" in onnx_input_names:
+        feed["input_ids"] = enc["input_ids"].astype(np.int64)
+
+    if "attention_mask" in onnx_input_names:
+        feed["attention_mask"] = enc["attention_mask"].astype(np.int64)
+
+    if "token_type_ids" in onnx_input_names:
+        if "token_type_ids" in enc:
+            feed["token_type_ids"] = enc["token_type_ids"].astype(np.int64)
+        else:
+            # tokenizer が返さない場合は 0 埋め
+            feed["token_type_ids"] = np.zeros_like(
+                enc["input_ids"], dtype=np.int64
+            )
+
+    # position_ids を明示的に追加
+    if "position_ids" in onnx_input_names:
+        batch_size, seq_len = enc["input_ids"].shape
+        feed["position_ids"] = np.tile(
+            np.arange(seq_len, dtype=np.int64),
+            (batch_size, 1),
+        )
+
+    # 念のためチェック
+    missing = [n for n in onnx_input_names if n not in feed]
+    if missing:
+        raise RuntimeError(
+            f"Missing ONNX inputs {missing}. tokenizer keys={list(enc.keys())}"
+        )
+
+    return feed
+
+def calib_generator(texts, num_batches: int = 500):
+    # aimet_onnx の compute_encodings は iterable を受け取れる（dictをyield）
+    for i, t in enumerate(texts):
+        if i >= num_batches:
+            break
+        yield make_feed(t)
+
+
+
+# 5) compute encodings
+# 代表データ 500～1000サンプルが目安（AIMET docsでもそのレンジ）
+sim.compute_encodings(calib_generator(calib_texts, num_batches=600))
+# 6) export (QDQ onnx + encodings json)
+OUT_DIR = "/root/AIMET_ENV/tools/ruri/model"
+
+sim.export(
+    path=OUT_DIR,
+    filename_prefix="ruri_ptq_quat_article",
+    export_model=True,
+    export_int32_bias=True,    # 迷ったらTrueでOK（INT32 bias encodingを生成）
+    encoding_version="1.0.0",  # デフォルトでも可
+)
+
+print("Done. Exported to:", OUT_DIR)
+print("QDQ model:", os.path.join(OUT_DIR, "ruri_ptq_quat_article.onnx"))
+print("Encodings:", os.path.join(OUT_DIR, "ruri_ptq_quat_article.encodings"))
