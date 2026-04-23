@@ -15,9 +15,49 @@ def remove_graph_output(graph, name: str):
     for i in reversed(idxs):
         del graph.output[i]
 
+def ensure_input(graph, name, elem_type=TensorProto.INT64, shape=["batch_size", "sequence_length"]):
+    if name not in [i.name for i in graph.input]:
+        graph.input.append(helper.make_tensor_value_info(name, elem_type, shape))
+
+def add_dummy_inputs_and_keep_attention_mask(graph):
+    ensure_input(graph, "token_type_ids")
+    ensure_input(graph, "position_ids")
+
+    if not any(init.name == "zero_i64" for init in graph.initializer):
+        graph.initializer.append(helper.make_tensor("zero_i64", TensorProto.INT64, [], [0]))
+
+    target = "attention_mask"
+    keep_name = target + "_keep"
+
+    mul_tt = helper.make_node("Mul", ["token_type_ids", "zero_i64"], ["tt_zero"], name="TT_Zero")
+    mul_pos = helper.make_node("Mul", ["position_ids", "zero_i64"], ["pos_zero"], name="POS_Zero")
+    add_0 = helper.make_node("Add", ["tt_zero", "pos_zero"], ["dummy_zero"], name="DummyZeroSum")
+    add_t = helper.make_node("Add", [target, "dummy_zero"], [keep_name], name="AddDummyToMask")
+
+    first_consumer = None
+    for idx, node in enumerate(graph.node):
+        if target in node.input:
+            first_consumer = idx
+            break
+    if first_consumer is None:
+        raise RuntimeError("attention_mask is not used anywhere")
+
+    new_nodes = [mul_tt, mul_pos, add_0, add_t]
+    for n in reversed(new_nodes):
+        graph.node.insert(first_consumer, n)
+
+    start_replace = first_consumer + len(new_nodes)
+    for node in graph.node[start_replace:]:
+        for i, inp in enumerate(node.input):
+            if inp == target:
+                node.input[i] = keep_name
+
 def main(in_path: str, out_path: str):
     model = onnx.load(in_path)
     graph = model.graph
+
+    # --- 1) token_type_ids / position_ids の dummy input 追加 ---
+    add_dummy_inputs_and_keep_attention_mask(graph)
 
     # --- 1) last_hidden_state を探す ---
     target_output_name = None
