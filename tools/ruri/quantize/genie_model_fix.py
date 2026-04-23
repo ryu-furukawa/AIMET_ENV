@@ -16,10 +16,12 @@ def remove_graph_output(graph, name: str):
         del graph.output[i]
 
 def ensure_input(graph, name, elem_type=TensorProto.INT64, shape=["batch_size", "sequence_length"]):
+    """graph.input に name が存在しない場合のみ入力を追加する。"""
     if name not in [i.name for i in graph.input]:
         graph.input.append(helper.make_tensor_value_info(name, elem_type, shape))
 
 def add_dummy_inputs_and_keep_attention_mask(graph):
+    """dummy input を追加し、attention_mask の参照を attention_mask_keep に差し替える。"""
     ensure_input(graph, "token_type_ids")
     ensure_input(graph, "position_ids")
 
@@ -59,7 +61,7 @@ def main(in_path: str, out_path: str):
     # --- 1) token_type_ids / position_ids の dummy input 追加 ---
     add_dummy_inputs_and_keep_attention_mask(graph)
 
-    # --- 1) last_hidden_state を探す ---
+    # --- 2) last_hidden_state を探す ---
     target_output_name = None
     for o in graph.output:
         if o.name == "last_hidden_state":

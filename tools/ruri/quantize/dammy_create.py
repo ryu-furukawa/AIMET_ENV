@@ -1,4 +1,7 @@
-from genie_model_fix import main
+try:
+    from .genie_model_fix import main
+except ImportError:
+    from genie_model_fix import main
 
 model_path = "/root/AIMET_ruri/ruri-onnx/model.onnx"
 out_path = "/root/AIMET_ruri/ruri-onnx/model_dummy_input.onnx"
