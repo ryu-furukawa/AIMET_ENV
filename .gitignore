@@ -1,19 +1,15 @@
-# Python
+# ===== Generated artifacts =====
+tools/ruri/convert/output/
+tools/ruri/convert/cpp_w8a*/
+tools/ruri/convert/cpp_w8a*_htp_v*/
+tools/ruri/convert/script/jmteb_result/
+tools/ruri/convert/script/result/
+tools/ruri/convert/script/prompt.txt
+
+# ===== Large / auto-generated files =====
+*.bin
+*.jsonl
+
+# ===== Cache =====
 __pycache__/
 *.pyc
-
-# env
-.venv/
-.env
-
-# large artifacts
-*.onnx
-*.pt
-*.pth
-*.raw
-*.npy
-
-# logs
-*.log
-results/
-ruri-small-v2/*
