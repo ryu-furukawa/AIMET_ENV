@@ -9,6 +9,8 @@ tools/ruri/convert/script/prompt.txt
 # ===== Large / auto-generated files =====
 *.bin
 *.jsonl
+*.onnx
+*.raw
 
 # ===== Cache =====
 __pycache__/
