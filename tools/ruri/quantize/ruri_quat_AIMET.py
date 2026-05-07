@@ -10,7 +10,8 @@ from aimet_onnx.common.defs import QuantScheme
 from aimet_onnx import QuantizationSimModel
 
 #FP32_ONNX = "/root/AIMET_ruri/ruri-onnx/model_simplified.onnx"
-FP32_ONNX = "/root/AIMET_ruri/ruri-onnx/model_simplified.onnx"
+#FP32_ONNX = "/root/AIMET_ruri/ruri-onnx/model_simplified.onnx"
+FP32_ONNX = "/root/AIMET_ENV/tools/ruri/quantize/ruri-export-onnx/model_fix.onnx"
 #FP32_ONNX = "/root/AIMET_ruri/ruri-onnx/model.onnx"  # ← 適宜変更
 OUT_DIR = "/root/AIMET_ENV/tools/ruri/model"
 
@@ -29,7 +30,17 @@ model = onnx.load_model(FP32_ONNX)
 # 2) (推奨) simplify
 try:
     import onnxsim
-    model, _ = onnxsim.simplify(model)
+    B=1
+    S=512
+    model, _ = onnxsim.simplify(
+        model,
+        overwrite_input_shapes={
+            "input_ids":      [B, S],
+            "attention_mask": [B, S],
+            "token_type_ids": [B, S],
+            "position_ids":   [B, S],
+        },
+    )
 except Exception as e:
     print("onnxsim simplify failed, continue with original model:", repr(e))
 
@@ -54,32 +65,8 @@ onnx_input_names = [i.name for i in sim.model.model.graph.input]
 print("ONNX inputs:", onnx_input_names)
 
 # 4) calibration data (代表テキスト。実運用に近い文を500〜1000程度推奨)
-"""
-calib_texts = [
-    "クエリ: 瑠璃色はどんな色？",
-    "文章: 瑠璃色（るりいろ）は、紫みを帯びた濃い青。名は、半貴石の瑠璃（ラピスラズリ、英: lapis lazuli）による。JIS慣用色名では「こい紫みの青」（略号 dp-pB）と定義している[1][2]。",
-    "クエリ: ワシやタカのように、鋭いくちばしと爪を持った大型の鳥類を総称して「何類」というでしょう?",
-    "文章: ワシ、タカ、ハゲワシ、ハヤブサ、コンドル、フクロウが代表的である。これらの猛禽類はリンネ前後の時代(17~18世紀)には鷲類・鷹類・隼類及び梟類に分類された。ちなみにリンネは狩りをする鳥を単一の目(もく)にまとめ、vultur(コンドル、ハゲワシ)、falco(ワシ、タカ、ハヤブサなど)、strix(フクロウ)、lanius(モズ)の4属を含めている。",
-] * 200  # 例: 900文
-"""
-"""
-queries = [
-    "クエリ: 瑠璃色はどんな色？",
-     "クエリ: ワシやタカのように、鋭いくちばしと爪を持った大型の鳥類を総称して「何類」というでしょう?",
-] * 300
-
-passages = [
-     "文章: 瑠璃色（るりいろ）は、紫みを帯びた濃い青。名は、半貴石の瑠璃（ラピスラズリ、英: lapis lazuli）による。JIS慣用色名では「こい紫みの青」（略号 dp-pB）と定義している[1][2]。",
-     "文章: ワシ、タカ、ハゲワシ、ハヤブサ、コンドル、フクロウが代表的である。これらの猛禽類はリンネ前後の時代(17~18世紀)には鷲類・鷹類・隼類及び梟類に分類された。ちなみにリンネは狩りをする鳥を単一の目(もく)にまとめ、vultur(コンドル、ハゲワシ)、falco(ワシ、タカ、ハヤブサなど)、strix(フクロウ)、lanius(モズ)の4属を含めている。",
-] * 120
-
-calib_texts = queries + passages
-
-
-
-"""
 from datasets import Dataset 
-arrow_path = "/root/test_qut/data/vocab800/article_200_exe.arrow"  # ← 適宜変更
+arrow_path = "/root/AIMET_ENV/tools/ruri/data/mix200_exe.arrow"  # ← 適宜変更
 ds = Dataset.from_file(arrow_path)
 
 calib_texts = ds["text"]  # ← "text" 列を適宜変更
@@ -147,12 +134,10 @@ OUT_DIR = "/root/AIMET_ENV/tools/ruri/model"
 
 sim.export(
     path=OUT_DIR,
-    filename_prefix="ruri_ptq_quat_article",
+    filename_prefix="ruri_ptq_quat_article_fix",
     export_model=True,
     export_int32_bias=True,    # 迷ったらTrueでOK（INT32 bias encodingを生成）
     encoding_version="1.0.0",  # デフォルトでも可
 )
 
 print("Done. Exported to:", OUT_DIR)
-print("QDQ model:", os.path.join(OUT_DIR, "ruri_ptq_quat_article.onnx"))
-print("Encodings:", os.path.join(OUT_DIR, "ruri_ptq_quat_article.encodings"))

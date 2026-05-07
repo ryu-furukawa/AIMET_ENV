@@ -128,7 +128,6 @@ def main():
         input_names=[
             "input_ids",
             "attention_mask",
-            #"token_type_ids",  # ruri は通常 token_type_ids を受け取らない想定
         ],
         output_names=[
             "last_hidden_state",

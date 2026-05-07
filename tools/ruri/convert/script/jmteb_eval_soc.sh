@@ -10,8 +10,8 @@ export MODEL=/root/AIMET_ruri/ruri-small-v2
 #export EVAL_DATASET="['mrtydi']"
 #export EVAL_DATASET="['jagovfaqs_22k']"
 #export EVAL_DATASET="['nlp_journal_title_abs','nlp_journal_title_intro','nlp_journal_abs_intro','nlp_journal_abs_article']"
-export EVAL_DATASET="['nlp_journal_abs_intro']"
-#export EVAL_DATASET="['nlp_journal_title_abs','nlp_journal_title_intro','nlp_journal_abs_intro','nlp_journal_abs_article','jagovfaqs_22k']"
+#export EVAL_DATASET="['nlp_journal_abs_intro']"
+export EVAL_DATASET="['nlp_journal_title_abs','nlp_journal_title_intro','nlp_journal_abs_intro','nlp_journal_abs_article','jagovfaqs_22k']"
 #dim_list=(768 512 384 256 192 128 64 32)
 model_list=(
     ruri_w8a16_PT_htp_v73 

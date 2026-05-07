@@ -4,11 +4,11 @@ import torch.nn.functional as F
 
 
 # ファイルパスを指定
-file1_path = '/root/AIMET_ENV/tools/comp_raw/ruri_0_seq.raw'
-file2_path = '/root/AIMET_ENV/tools/comp_raw/onnx.raw'
+file1_path = '/root/AIMET_ENV/tools/comp_raw/ruri_0_pooled.raw'
+#file2_path = '/root/AIMET_ENV/tools/comp_raw/onnx.raw'
 
 #file1_path = '/root/jmteb/emu/output_2/Result_0/pooled_output.raw'
-#file2_path = '/root/output_nlp/Result_0/pooled_output.raw'
+file2_path = '/root/AIMET_ENV/tools/comp_raw/onnx_0_pooled_pos.raw'
 
 
 

@@ -25,8 +25,8 @@ board_lib_dir=/data/local/tmp/htp/lib
 
 # Result Dir
 sentence_txt_dir=/root/AIMET_ENV/tools/ruri/convert/script/result/sentence
-vector_result_dir=/root/AIMET_ENV/tools/ruri/convert/script/result/vector_quat
-pooling_result_dir=/root/AIMET_ENV/tools/ruri/convert/script/result/pooling_quat
+vector_result_dir=/root/AIMET_ENV/tools/ruri/convert/script/result/vector_abs
+pooling_result_dir=/root/AIMET_ENV/tools/ruri/convert/script/result/pooling_abs
 
 mkdir -p ${sentence_txt_dir}
 mkdir -p ${vector_result_dir}
@@ -34,13 +34,6 @@ mkdir -p ${pooling_result_dir}
 
 model_list=(
     ruri_w8a16_PT_htp_v73 
-    ruri_w8a8_PT_htp_v73 
-    ruri_w8a16_PT 
-    ruri_w8a8_PT 
-    ruri_w8a16_minmax_htp_v73 
-    ruri_w8a8_minmax_htp_v73 
-    ruri_w8a16_minmax 
-    ruri_w8a8_minmax
 )
 
 for model_name in ${model_list[@]}

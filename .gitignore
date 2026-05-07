@@ -5,7 +5,7 @@ tools/ruri/convert/cpp_w8a*_htp_v*/
 tools/ruri/convert/script/jmteb_result/
 tools/ruri/convert/script/result/
 tools/ruri/convert/script/prompt.txt
-
+tools/ruri/ruri-small-v2/
 # ===== Large / auto-generated files =====
 *.bin
 *.jsonl

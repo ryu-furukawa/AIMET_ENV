@@ -4,7 +4,7 @@ import onnxruntime as ort
 import numpy as np
 
 MODEL_DIR = "/root/AIMET_ruri/ruri-small-v2/"
-ONNX_PATH = "/root/AIMET_ruri_v2/ruri-onnx_vvv/model.onnx"  # 実在パスに合わせて
+ONNX_PATH = "/root/AIMET_ENV/tools/ruri/quantize/ruri-export-onnx/model.onnx"  # 実在パスに合わせて
 TEXT = "クエリ: 瑠璃色はどんな色？"
 
 tok = AutoTokenizer.from_pretrained(MODEL_DIR, local_files_only=True, trust_remote_code=True)

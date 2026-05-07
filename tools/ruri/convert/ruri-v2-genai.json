@@ -1,0 +1,43 @@
+{
+  "embedding" : {
+    "version" : 1,
+    "context": {
+      "version": 1,
+      "n-vocab": 32768,
+      "ctx-size": 512,
+      "embed-size" : 768,
+      "pad-token" : 0
+    },
+    "prompt": {
+      "version" : 1,
+      "prompt-template": ["[CLS]","[SEP]"]
+    },
+    "tokenizer" : {
+      "version" : 1,
+      "path" : "ruri_tokenizer.json"
+    },
+    "truncate-input" : true,
+    "engine": {
+      "version": 1,
+      "n-threads" : 10,
+      "backend" : {
+        "version" : 1,
+        "type" : "QnnGenAiTransformer",
+        "QnnGenAiTransformer" : {
+          "version" : 1,
+          "n-layer": 6,
+          "n-embd": 768,
+          "n-heads": 16
+        }
+      },
+      "model" : {
+        "version" : 1,
+        "type" : "library",
+        "library" : {
+          "version" : 1,
+          "model-bin" : "ruri_genai.bin"
+        }
+      }
+    }
+  }
+}
