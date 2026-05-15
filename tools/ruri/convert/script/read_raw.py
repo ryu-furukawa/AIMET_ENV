@@ -32,9 +32,9 @@ def read_raw_file(file_path, model_dim):
 
 
     # Convert to tensor and normalize
-    sentence_embeddings = torch.mean(torch.tensor(reshaped_buffer), dim=0)
+    #sentence_embeddings = torch.mean(torch.tensor(reshaped_buffer), dim=0)
     #平均済みの場合
-    #sentence_embeddings = torch.tensor(reshaped_buffer).reshape(-1)
+    sentence_embeddings = torch.tensor(reshaped_buffer).reshape(-1)
 
     return sentence_embeddings
 

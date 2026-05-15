@@ -2,18 +2,18 @@
 set -e
 
 SECONDS=0
-LOG_FILE="/root/AIMET_ENV/tools/ruri/convert/script/runtime_htp_w8a8_PT.log"
+LOG_FILE="/root/AIMET_ENV/tools/ruri/convert/script/runtime_0514.log"
 
 
 # Model Info
 model=/root/AIMET_ENV/ruri-small-v2
-config_file=ruri-v2-htp.json
+config_file=ruri-v2-htp-no-pos.json
 
 # Dataset Info
 dataset_path=/root/jmteb_260326
-#dataset_name_list=(nlp_journal_abs_intro)
+dataset_name_list=(nlp_journal_title_abs)
 #dataset_name_list=(nlp_journal_abs_intro nlp_journal_title_abs nlp_journal_title_intro nlp_journal_abs_article)
-dataset_name_list=(nlp_journal_abs_intro nlp_journal_title_abs nlp_journal_title_intro nlp_journal_abs_article jagovfaqs_22k)
+#dataset_name_list=(nlp_journal_abs_intro nlp_journal_title_abs nlp_journal_title_intro nlp_journal_abs_article jagovfaqs_22k)
 #dataset_name_list=(jagovfaqs_22k)
 vocab_type_list=(query corpus)
 #vocab_type_list=(query)
@@ -25,15 +25,17 @@ board_lib_dir=/data/local/tmp/htp/lib
 
 # Result Dir
 sentence_txt_dir=/root/AIMET_ENV/tools/ruri/convert/script/result/sentence
-vector_result_dir=/root/AIMET_ENV/tools/ruri/convert/script/result/vector_abs
-pooling_result_dir=/root/AIMET_ENV/tools/ruri/convert/script/result/pooling_abs
+vector_result_dir=/root/AIMET_ENV/tos/ruri/convert/script/result/vector_0514
+pooling_result_dir=/root/AIMET_ENV/tools/ruri/convert/script/result/pooling_0514
 
 mkdir -p ${sentence_txt_dir}
 mkdir -p ${vector_result_dir}
 mkdir -p ${pooling_result_dir}
 
 model_list=(
-    ruri_w8a16_PT_htp_v73 
+    ruri_mask_tpi
+    
+
 )
 
 for model_name in ${model_list[@]}
@@ -82,5 +84,5 @@ do
         --result_pkl_dir ${pooling_quat_result_dir}
 
 
-    echo "$(date '+%Y-%m-%d %H:%M:%S') | Total elapsed time: $((SECONDS / 60)) min $((SECONDS % 60)) sec" >> "${LOG_FILE}"
+    echo "$(date '+%Y-%m-%d %H:%M:%S') | Total elapsed time: $((SECONDS / 60)) min $((SECONDS % 60)) sec ${model_name}" >> "${LOG_FILE}"
 done

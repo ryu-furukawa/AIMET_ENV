@@ -1,0 +1,1 @@
+/data/local/tmp/htp/ruri_bin/raw/0_input_ids.raw /data/local/tmp/htp/ruri_bin/raw/0_attention_mask.raw /data/local/tmp/htp/ruri_bin/raw/0_token_type_ids.raw /data/local/tmp/htp/ruri_bin/raw/0_position_ids.raw

@@ -38,7 +38,7 @@
         "binary" : {
           "version" : 1,
           "ctx-bins" : [
-            "ruri_fix_w8a16.bin"
+            "ruri.bin"
           ]
         }
       }

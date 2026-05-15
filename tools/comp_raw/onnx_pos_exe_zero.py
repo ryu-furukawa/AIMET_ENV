@@ -4,7 +4,7 @@ import onnxruntime as ort
 import numpy as np
 
 MODEL_DIR = "/root/AIMET_ENV/tools/ruri/ruri-small-v2"
-ONNX_PATH = "/root/AIMET_ENV/tools/ruri/quantize/ruri-export-onnx/model_fix.onnx"  # 実在パスに合わせて
+ONNX_PATH = "/root/AIMET_ENV/tools/ruri/quantize/ruri-export-onnx/model_mask_add.onnx"  # 実在パスに合わせて
 TEXT = "クエリ: 瑠璃色はどんな色？"
 
 
@@ -12,7 +12,13 @@ tok = AutoTokenizer.from_pretrained(MODEL_DIR, local_files_only=True, trust_remo
 # ------------------------------------------------------------
 # 1) Tokenize（右/左パディングに依存せず position_ids を安全に作る）
 # ------------------------------------------------------------
-enc = tok(TEXT, return_tensors="np", truncation=True, max_length=512)
+enc = tok(
+    TEXT,
+    return_tensors="np", 
+    truncation=True, 
+    max_length=512,
+    #padding="max_length",  # 右/左どちらでもOK
+    )
 
 # onnxruntime は int64 を推奨
 input_ids = enc["input_ids"].astype(np.int64)              # (1, L)
@@ -63,9 +69,9 @@ if name_map["position_ids"]:
 
 outs = sess.run(None, inputs)
 arr = outs[0][0].astype(np.float32)  # 例: (seq_len, hidden) あるいは (hidden,) などモデル次第
-arr.tofile("onnx_0_seq_pos.raw")
-print("saved onnx_0_seq_pos.raw", arr.shape, arr.dtype)
+arr.tofile("mask_0_seq_pos.raw")
+print("saved mask_0_seq_pos.raw", arr.shape, arr.dtype)
 
 aar2=outs[1][0].astype(np.float32)  # 例: pooled output (hidden,) などモデル次第
-aar2.tofile("onnx_0_pooled_pos.raw")
-print("saved onnx_0_pooled_pos.raw", aar2.shape, aar2.dtype)
+aar2.tofile("mask_0_pooled_pos.raw")
+print("saved mask_0_pooled_pos.raw", aar2.shape, aar2.dtype)

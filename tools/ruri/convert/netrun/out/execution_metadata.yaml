@@ -1,0 +1,33 @@
+---
+timestamp: 462886948316
+command: ./qnn-net-run --backend libQnnHtp.so --retrieve_context ruri.bin --input_list input_list_soc.txt --output_dir out
+execution_mode: asynchronous
+inferences_completed: 1
+graphs:
+  - graph_name: model
+    input_tensors:
+    - tensor_name: input_ids
+      id: 1
+      datatype: QNN_DATATYPE_INT_32
+      dimensions: [1,512]
+    - tensor_name: attention_mask
+      id: 2
+      datatype: QNN_DATATYPE_INT_32
+      dimensions: [1,512]
+    - tensor_name: token_type_ids
+      id: 3
+      datatype: QNN_DATATYPE_INT_32
+      dimensions: [1,512]
+    - tensor_name: position_ids
+      id: 4
+      datatype: QNN_DATATYPE_INT_32
+      dimensions: [1,512]
+    output_tensors:
+    - tensor_name: sequence_output
+      id: 366
+      datatype: QNN_DATATYPE_UFIXED_POINT_16
+      dimensions: [1,512,768]
+    - tensor_name: pooled_output
+      id: 368
+      datatype: QNN_DATATYPE_UFIXED_POINT_16
+      dimensions: [1,768]
