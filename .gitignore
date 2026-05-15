@@ -11,7 +11,7 @@ tools/ruri/ruri-small-v2/
 *.jsonl
 *.onnx
 *.raw
-
+*.so
 # ===== Cache =====
 __pycache__/
 *.pyc
