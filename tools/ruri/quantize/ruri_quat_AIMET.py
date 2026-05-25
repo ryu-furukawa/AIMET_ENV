@@ -9,10 +9,9 @@ import aimet_onnx
 from aimet_onnx.common.defs import QuantScheme
 from aimet_onnx import QuantizationSimModel
 
-#FP32_ONNX = "/root/AIMET_ruri/ruri-onnx/model_simplified.onnx"
-#FP32_ONNX = "/root/AIMET_ruri/ruri-onnx/model_simplified.onnx"
-FP32_ONNX = "/root/AIMET_ENV/tools/ruri/quantize/ruri-export-onnx/model_tpi_mask.onnx"
-#FP32_ONNX = "/root/AIMET_ruri/ruri-onnx/model.onnx"  # ← 適宜変更
+
+FP32_ONNX = "/root/AIMET_ENV/tools/ruri/quantize/ruri-export-onnx/model_mask_add_-6.onnx"
+#FP32_ONNX = "/root/AIMET_ENV/tools/ruri/quantize/ruri-export-onnx/model_fix_mask.onnx"  # ← 適宜変更
 OUT_DIR = "/root/AIMET_ENV/tools/ruri/model"
 
 os.makedirs(OUT_DIR, exist_ok=True)
@@ -25,28 +24,6 @@ tokenizer = AutoTokenizer.from_pretrained(
 )
 
 # 1) load onnx
-model = onnx.load_model(FP32_ONNX)
-
-# 2) (推奨) simplify
-"""
-try:
-    import onnxsim
-    B=1
-    S=512
-    model, _ = onnxsim.simplify(
-        model,
-        overwrite_input_shapes={
-            "input_ids":      [B, S],
-            "attention_mask": [B, S],
-            "token_type_ids": [B, S],
-            "position_ids":   [B, S],
-        },
-    )
-except Exception as e:
-    print("onnxsim simplify failed, continue with original model:", repr(e))
-"""
-
-import onnx
 
 model = onnx.load_model(FP32_ONNX)
 
@@ -80,12 +57,13 @@ sim = QuantizationSimModel(
 
     model,
     param_type=aimet_onnx.int8,
+    #activation_type=aimet_onnx.int8,
     activation_type=aimet_onnx.int16,
     #quant_scheme=QuantScheme.min_max,
     quant_scheme=QuantScheme.post_training_tf_enhanced,
     #config_file="default",
     config_file="htp_v73",
-    #config_file="/root/AIMET_ruri_v2/tool/quantsim_fp_escape.json",  # ← 適宜変更
+    #config_file="/root/AIMET_ENV/tools/ruri/quantize/custom_config.json",  # ← 適宜変更
     providers=providers,
 )
 
@@ -98,7 +76,9 @@ from datasets import Dataset
 #arrow_path = "/root/jmteb_260326/nlp_journal_abs_article-corpus/corpus/data-00000-of-00001.arrow"  # ← 適宜変更
 #arrow_path = "/root/jmteb_260326/nlp_journal_abs_article-query/validation/data-00000-of-00001.arrow"
 #arrow_path = "/root/AIMET_ENV/tools/ruri/data/merged_1000.arrow"  # ← 適宜変更
-arrow_path = "/root/AIMET_ENV/tools/ruri/data/article_200_exe.arrow"  # ← 適宜変更
+#arrow_path = "/root/AIMET_ENV/tools/ruri/data/mix200.arrow"  # ← 適宜変更
+#arrow_path = "/root/AIMET_ENV/tools/ruri/data/article_200_exe.arrow"  # ← 適宜変更
+arrow_path = "/root/AIMET_ENV/tools/ruri/data/abs200.arrow"
 ds = Dataset.from_file(arrow_path)
 print("Dataset columns:", ds.column_names)
 
@@ -167,10 +147,10 @@ OUT_DIR = "/root/AIMET_ENV/tools/ruri/model"
 
 sim.export(
     path=OUT_DIR,
-    filename_prefix="ruri_tpi_mask_art",  # ← 適宜変更
+    filename_prefix="ruri_w8a16_abs_-6",  # ← 適宜変更
     export_model=True,
     export_int32_bias=True,    # 迷ったらTrueでOK（INT32 bias encodingを生成）
-    encoding_version="1.0.0",  # デフォルトでも可
+    #encoding_version="1.0.0",  # デqフォルトでも可
 )
 
 print("Done. Exported to:", OUT_DIR)

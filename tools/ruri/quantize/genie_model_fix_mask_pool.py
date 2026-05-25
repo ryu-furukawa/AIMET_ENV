@@ -127,11 +127,20 @@ def add_masked_mean_pooling(graph, sequence_output: str, mask_name: str, pooled_
 
     # ---- denom ----
     denom = "denom"
+    
     denom_node = helper.make_node(
         "Add",
         inputs=[sum_mask, eps_name],
         outputs=[denom]
     )
+     
+    """HTP変換時のエラーのため
+    denom_node = helper.make_node(
+        "Max",
+        inputs=[sum_mask, eps_name],
+        outputs=[denom]
+    )
+    """
 
     # ---- div ----
     div_node = helper.make_node(

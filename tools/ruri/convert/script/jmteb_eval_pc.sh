@@ -5,7 +5,7 @@ set -e
 
 cd /root/JMTEB
 
-source /root/jmteb_data4_onnx/bin/activate
+source /root/jmteb_data4/bin/activate
 export DATASET_PATH="/root/jmteb_260326"
 #export DATASET_PATH="/root/jmteb_1104"
 #export MODEL=/root/AIMET_ruri_v2/ruri-small-v2-onnx

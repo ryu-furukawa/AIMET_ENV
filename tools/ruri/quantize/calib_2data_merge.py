@@ -80,7 +80,7 @@ if __name__ == "__main__":
     take_two_and_merge(
         arrow_a="/root/jmteb_260326/nlp_journal_abs_article-query/test/data-00000-of-00001.arrow",
         arrow_b="/root/jmteb_260326/nlp_journal_abs_article-corpus/corpus/data-00000-of-00001.arrow",
-        out_arrow="/root/AIMET_ENV/tools/ruri/data/abs-article-100-100-200.arrow",
+        out_arrow="/root/AIMET_ENV/tools/ruri/data/mix200.arrow",
         text_col="query",
         text_col2="text",
         take_each=500,

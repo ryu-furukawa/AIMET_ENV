@@ -4,23 +4,28 @@ set -e
 source /root/jmteb_data4/bin/activate
 
 cd /root/JMTEB
-export pkl_dir="/root/AIMET_ENV/tools/ruri/convert/script/result/pooling_0514"
+export pkl_dir="/root/AIMET_ENV/tools/ruri/convert/script/result/pooling_0521"
 export MODEL=/root/AIMET_ENV/tools/ruri/ruri-small-v2
 #export MODEL=/root/t2e/ruri-small-v2
 #export EVAL_DATASET="['mrtydi']"
 #export EVAL_DATASET="['jagovfaqs_22k']"
 #export EVAL_DATASET="['nlp_journal_title_abs','nlp_journal_title_intro','nlp_journal_abs_intro','nlp_journal_abs_article']"
-export EVAL_DATASET="['nlp_journal_title_abs']"
+#export EVAL_DATASET="['nlp_journal_title_abs']"
 #export EVAL_DATASET="['nlp_journal_title_abs','nlp_journal_title_intro','nlp_journal_abs_intro']"
-#xport EVAL_DATASET="['nlp_journal_title_abs','nlp_journal_title_intro','nlp_journal_abs_intro','nlp_journal_abs_article','jagovfaqs_22k']"
+export EVAL_DATASET="['nlp_journal_title_abs','nlp_journal_title_intro','nlp_journal_abs_intro','nlp_journal_abs_article','jagovfaqs_22k']"
 #dim_list=(768 512 384 256 192 128 64 32)
-model_list=(ruri_mask_tpi) 
+model_list=(
+    ruri_w8a16_art_-6
+    ruri_w8a16_abs_-6
+    ruri_w8a16_mix_-6
+    ruri_w8a16_mix1000_-6
+    ) 
 
 
 for model_name in ${model_list[@]}; do
     poetry run python -m jmteb  --embedder SentenceBertEmbedder   \
                                 --embedder.model_name_or_path $MODEL   \
-                                --save_dir "/root/AIMET_ENV/tools/ruri/convert/script/jmteb_result/jmteb_free/$model_name"   \
+                                --save_dir "/root/AIMET_ENV/tools/ruri/convert/script/jmteb_result/0521/$model_name"   \
                                 --eval_include "$EVAL_DATASET" \
                                 --pkl_path "$pkl_dir/$model_name" \
                                 --log_predictions true \

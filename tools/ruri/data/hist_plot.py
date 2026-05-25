@@ -103,7 +103,7 @@ def plot_hist(arr: np.ndarray, title: str, out_png: str, bin_width=16, max_plot_
 
 def main():
     TOKENIZER_DIR = "/root/AIMET_ENV/tools/ruri/ruri-small-v2"
-    ARROW_PATH = "/root/test_qut/data/merged_test_use.arrow"
+    ARROW_PATH = "/root/AIMET_ENV/tools/ruri/data/abs_200_exe.arrow"
     COUNT_MODE = "raw"      # "raw" or "model"
     MAX_LENGTH = 512        
     OUT_DIR = "."  # 出力先ディレクトリ

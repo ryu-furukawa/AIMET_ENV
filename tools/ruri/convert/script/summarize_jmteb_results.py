@@ -2,7 +2,7 @@ import os
 import json
 import pandas as pd
 
-base_dir = "/root/AIMET_ENV/tools/ruri/convert/script/jmteb_result/jmteb_soc_quat"
+base_dir = "/root/AIMET_ENV/tools/ruri/convert/script/jmteb_result/0521"
 
 results = {}
 

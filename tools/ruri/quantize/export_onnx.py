@@ -5,8 +5,8 @@ import torch
 from torch import nn
 from transformers import AutoTokenizer, AutoModel
 
-MODEL_NAME = "/root/AIMET_ruri/ruri-small-v2"
-OUT_DIR = "/root/AIMET_ruri_v2/ruri-onnx_vvv"
+MODEL_NAME = "/root/AIMET_ENV/tools/ruri/ruri-small-v2"
+OUT_DIR = "/root/AIMET_ENV/tools/ruri/quantize/ruri-export-onnx"
 SEQ_LEN = 512
 OPSET = 17
 
